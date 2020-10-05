@@ -1,24 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import Details from './components/Details';
+import axios from 'axios';
+import NewApp from './components/NewApp';
+import HomePage from './components/HomePage';
+import MealRecipes from './components/MealRecipes';
+import { Route, Switch } from 'react-router-dom';
+import SearchFood from './components/SearchFood';
 
 function App() {
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    async function recipes() {
+      const res = await axios(
+        'https://www.themealdb.com/api/json/v1/1/search.php?s='
+      );
+      console.log(res.data);
+      setData(res.data);
+    }
+    recipes();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Delicious Meals</h1>
+      <HomePage />
+      <Switch>
+        <Route
+          exact
+          path="/recipes"
+          render={(props) => <MealRecipes recipes={data} {...props} />}
+        ></Route>
+        <Route
+          exact
+          path="/recipes/:details"
+          render={(props) => <Details {...props} />}
+        />
+        <Route path="/newapp" render={() => <NewApp />}></Route>
+        <Route path="/searchfood" render={() => <SearchFood />}></Route>
+      </Switch>
     </div>
   );
 }
